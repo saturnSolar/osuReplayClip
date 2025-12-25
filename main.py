@@ -17,16 +17,18 @@ try:
 except: raise FileNotFoundError('conf.json is missing!')
 
 #verify configurations
-if not (conf['danser_path'] == "" or conf['osu_path'] == ""): FileNotFoundError('danser-cli.exe does not exist!')
 osu_path = conf['osu_path']
-available_beatmaps = os.listdir(osu_path)
+try:
+    available_beatmaps = os.listdir(osu_path)
+except:
+    FileNotFoundError('danser-cli.exe does not exist!')
 
 try: api = Ossapi(conf['client_id'], conf['client_secret'])
 except: APIException('Invalid credentials.')
 
 #A temp configurations for danser as to not tamper the json itself.
 #This alternative patch is added when a beatmap is not available in the osu! folder.
-altpatch = {"General": {"OsuSongsDir": "C:\\Users\\ACER\\Documents\\FunnyPython\\osufame\\beatmaps"}}
+altpatch = {"General": {"OsuSongsDir": f"{os.path.abspath(osu_path + "/Songs")}"}}
 
 #FUNNIEST WAY TO DUPLICATE JSON STRING WITH SLIGHT DIFFERENCES BRUH
 with open('danser_conf.json', 'r', encoding="utf-8") as f:
