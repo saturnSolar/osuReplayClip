@@ -1,0 +1,29 @@
+{
+    "Recording":{
+        "OutputDir":"C:\\Users\\ACER\\Documents\\FunnyPython\\osufame\\vids",
+        "FPS": 30
+        },
+    "Skin": {
+        "CurrentSkin": "-            # Gawr Gura『GB』 #",
+        "UseColorsFromSkin": true,
+        "Cursor": {"UseSkinCursor": true}
+    },
+    "Gameplay": {
+        "ShowResultsScreen": false,
+        "StrainGraph": {"Show": false},
+        "HitCounter": {"Show": false}
+    },
+    "Playfield": {
+        "SeizureWarning": {"Enabled": false},
+        "Parallax": {"Enabled": false},
+        "Logo": {"Enabled": false}
+    },
+    "Objects": {
+        "Colors": {
+            "Color": {
+                "EnableRainbow": false,
+                "UseComboColors": true
+            }
+        }
+    }
+}
