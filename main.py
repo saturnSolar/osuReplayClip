@@ -28,7 +28,7 @@ except: APIException('Invalid credentials.')
 
 #A temp configurations for danser as to not tamper the json itself.
 #This alternative patch is added when a beatmap is not available in the osu! folder.
-altpatch = {"General": {"OsuSongsDir": f"{os.path.abspath(osu_path + "/Songs")}"}}
+altpatch = {"General": {"OsuSongsDir": os.path.abspath(f"{osu_path}/Songs")}}
 
 #FUNNIEST WAY TO DUPLICATE JSON STRING WITH SLIGHT DIFFERENCES BRUH
 with open('danser_conf.json', 'r', encoding="utf-8") as f:
