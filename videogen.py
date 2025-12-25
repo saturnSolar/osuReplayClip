@@ -6,6 +6,9 @@ font = "fonts/Abrade-Medium.ttf"
 directory = 'vids'
 
 def create_video(replaymetadata):
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+
     clips = sorted(os.listdir(directory))
     if not clips:
         print('No replays available, unfortunately.')
