@@ -21,10 +21,10 @@ osu_path = conf['osu_path']
 try:
     available_beatmaps = os.listdir(osu_path)
 except:
-    FileNotFoundError('danser-cli.exe does not exist!')
+    raise FileNotFoundError('danser-cli.exe does not exist!')
 
 try: api = Ossapi(conf['client_id'], conf['client_secret'])
-except: APIException('Invalid credentials.')
+except: raise APIException('Invalid credentials.')
 
 #A temp configurations for danser as to not tamper the json itself.
 #This alternative patch is added when a beatmap is not available in the osu! folder.
