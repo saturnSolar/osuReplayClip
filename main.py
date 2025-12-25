@@ -17,7 +17,7 @@ try:
 except: raise FileNotFoundError('conf.json is missing!')
 
 #verify configurations
-if not os.path.exists(conf['danser_path']): FileNotFoundError('danser-cli.exe does not exist!')
+if not (conf['danser_path'] == "" or conf['osu_path'] == ""): FileNotFoundError('danser-cli.exe does not exist!')
 osu_path = conf['osu_path']
 available_beatmaps = os.listdir(osu_path)
 
