@@ -17,11 +17,10 @@ try:
 except: raise FileNotFoundError('conf.json is missing!')
 
 #verify configurations
+if not (conf['osu_path'] or conf['danser_path']): 
+    raise FileNotFoundError('danser-cli.exe not found. Check your paths configuration!')
 osu_path = conf['osu_path']
-try:
-    available_beatmaps = os.listdir(osu_path)
-except:
-    raise FileNotFoundError('danser-cli.exe does not exist!')
+available_beatmaps = os.listdir(osu_path)
 
 try: api = Ossapi(conf['client_id'], conf['client_secret'])
 except: raise APIException('Invalid credentials.')
