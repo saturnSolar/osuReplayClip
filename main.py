@@ -1,20 +1,25 @@
 #Attempt at a rewrite using a python wrapper for osu! api
 
-import os, shutil
+import os
 import json
+from ossapi.ossapiv2_async import Score, ScoreTypeT
+from typing_extensions import Literal
 from ossapi import Ossapi, GameMode, ScoreType
 from osrparse import Replay
-from functions2 import *
+from ossapi.replay import Beatmap
+from functions2 import fetch_data, check_beatmaps, download_beatmap, find_difficulty, peak_timestamps, reset_data
 from osustrain import get_strains
 import subprocess
 import time
 from videogen import create_video
 
 #load configurations
+conf = {}
 try:
     with open('conf.json', 'r') as conff:
         conf = json.load(conff)
-except: raise FileNotFoundError('conf.json is missing!')
+except Exception as e:
+    print(f'conf.json is missing! {e}')
 
 #verify configurations
 if not (conf['osu_path'] or conf['danser_path']): 
@@ -23,7 +28,7 @@ osu_path = conf['osu_path']
 available_beatmaps = os.listdir(osu_path)
 
 try: api = Ossapi(conf['client_id'], conf['client_secret'])
-except: raise APIException('Invalid credentials.')
+except Exception as e: print(f'Invalid credentials. {e}')
 
 #A temp configurations for danser as to not tamper the json itself.
 #This alternative patch is added when a beatmap is not available in the osu! folder.
@@ -40,7 +45,9 @@ with open('danser_conf.json', 'r', encoding="utf-8") as f:
 patch = patch.replace('\"', '\\\"').replace('\n', '') #Make it compatible in CLI somehow
 altpatch = altpatch.replace('\"', '\\\"').replace('\n', '')
 
+
 def main():
+    scores = []
     match conf['mode']:
         case 'online': 
             scores = online_mode()
@@ -70,9 +77,11 @@ def local_mode():
     print('Checking beatmaps...')
     for replay in replay_files:
             raw_replay = Replay.from_path(f'localreplays/{replay}')
-
-            try: beatmap = api.beatmap(checksum=raw_replay.beatmap_hash)
-            except: Exception('Beatmap not found LOL')
+            beatmap = Beatmap
+            try: 
+                beatmap = api.beatmap(checksum=raw_replay.beatmap_hash)
+            except Exception as e:
+                print(f'Beatmap not found LOL: {e}')
             print(f'Found beatmap! {beatmap.beatmapset_id}')
             beatmap_data.append(beatmap)
 
@@ -85,7 +94,7 @@ def local_mode():
     #reset all cache data (except beatmaps folder if configured)
     reset_data(conf)
 
-    print(f'Generating local replay clips!')
+    print('Generating local replay clips!')
     start_time = time.time()
 
     for i, x in enumerate(beatmap_data):
@@ -110,7 +119,7 @@ def local_mode():
         else:
             args = f'{conf['danser_path']} -r=\"{os.path.abspath(file_name).replace('\\', '\\')}\" -end={end} -start={start} -out=\"{i}\" -sPatch=\"{patch}\" -offset=3 -noupdatecheck'
         
-        process = subprocess.run(args, text=conf['show_danser_output']) #CLI danser
+        subprocess.run(args, text=conf['show_danser_output']) #CLI danser
         
     end_time = time.time()
     print(f'Took {end_time - start_time}s!')
@@ -149,10 +158,10 @@ def online_mode():
         if conf['debug']: 
             print('[DEBUG MODE - skipped replay clips generator]')
             break
-        score_id = x.id
+        score_id : int = x.id
         try: replay = api.download_score(score_id=score_id, raw=True) #Check if the replay exists first, to prevent downloading beatmap for nothing
-        except:
-            print('Replay not found. Skipping...')
+        except Exception as e:
+            print(f'Replay not found. Skipping... Error: {e}')
             continue
 
         beatmap_dir = scores[i]['path']
