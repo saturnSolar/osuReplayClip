@@ -52,11 +52,11 @@ def download_beatmap(score:dict):
     if glob.glob(f'beatmaps/{beatmapset_id}*'): return os.path.abspath(f'beatmaps/{pathname}') #if it already been downloaded, to prevent duplicates (just in case it didn't passed the first test)
     
     #Download
-    # beatmap = requests.get(f'{directurl}/d/{beatmapset_id}?NoHitSound=true')
+    # beatmap = requests.get()
     # if beatmap.status_code != 200: #If failed, use catboy's
     # print(f"Unsuccessful GET request. Response is {beatmap.status_code}.\nTrying alternative mirror...")
     path = f'beatmaps/{pathname}.zip' #relative path lol
-    with requests.get(f'https://us.catboy.best/d/{beatmapset_id}', stream=True) as beatmap:
+    with requests.get(f'{directurl}/d/{beatmapset_id}?NoHitsound=true', stream=True) as beatmap:
         beatmap.raise_for_status()
         # if beatmap.status_code != 200: raise ConnectionError(f'Unsuccessful GET request. Response is {beatmap.status_code}.')
 
