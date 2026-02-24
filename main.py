@@ -3,7 +3,6 @@
 import os
 import json
 from ossapi.ossapiv2_async import Score, ScoreTypeT
-from typing_extensions import Literal
 from ossapi import Ossapi, GameMode, ScoreType
 from osrparse import Replay
 from ossapi.replay import Beatmap
@@ -30,9 +29,10 @@ available_beatmaps = os.listdir(osu_path)
 try: api = Ossapi(conf['client_id'], conf['client_secret'])
 except Exception as e: print(f'Invalid credentials. {e}')
 
-#A temp configurations for danser as to not tamper the json itself.
+#A dynamic configuration for danser as to not tamper the json itself.
+patch = {"General": {"OsuSongsDir": os.path.abspath(f"{osu_path}/Songs")}}
 #This alternative patch is added when a beatmap is not available in the osu! folder.
-altpatch = {"General": {"OsuSongsDir": os.path.abspath(f"{osu_path}/Songs")}}
+altpatch = {"General": {"OsuSongsDir": os.path.abspath(f"beatmaps")}}
 
 #FUNNIEST WAY TO DUPLICATE JSON STRING WITH SLIGHT DIFFERENCES BRUH
 with open('danser_conf.json', 'r', encoding="utf-8") as f:
@@ -40,7 +40,7 @@ with open('danser_conf.json', 'r', encoding="utf-8") as f:
     jsonfile.update(altpatch)
     altpatch = json.dumps(jsonfile)
     f.seek(0)
-    patch = json.dumps(json.load(f))    
+    patch = json.dumps(json.load(f).update(patch))    
 
 patch = patch.replace('\"', '\\\"').replace('\n', '') #Make it compatible in CLI somehow
 altpatch = altpatch.replace('\"', '\\\"').replace('\n', '')
@@ -177,7 +177,7 @@ def online_mode():
         file_name = f'replays/topplay_{i}.osr'
 
         if 'beatmaps\\' in beatmap_dir:
-            args = f'{conf['danser_path']} -r=\"{os.path.abspath(file_name).replace('\\', '\\')}\" -end={end} -start={start} -out=\"{i}\" -sPatch=\"{patch}\" -sPatch=\"{altpatch}\" -offset=3 -nodbcheck -noupdatecheck' #For beatmaps downloaded in beatmaps folder (relative)
+            args = f'{conf['danser_path']} -r=\"{os.path.abspath(file_name).replace('\\', '\\')}\" -end={end} -start={start} -out=\"{i}\" -sPatch=\"{altpatch}\" -offset=3 -nodbcheck' #For beatmaps downloaded in beatmaps folder (relative)
         else:
             args = f'{conf['danser_path']} -r=\"{os.path.abspath(file_name).replace('\\', '\\')}\" -end={end} -start={start} -out=\"{i}\" -sPatch=\"{patch}\" -offset=3 -noupdatecheck'
 
